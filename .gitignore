@@ -1,0 +1,12 @@
+# ROS2 build and cache artifacts
+build/
+install/
+log/
+__pycache__/
+*.pyc
+*.pyo
+
+# Lock files and temp files
+.~lock.*
+.DS_Store
+Thumbs.db
