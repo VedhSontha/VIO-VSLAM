@@ -68,7 +68,7 @@ Configurations and launch scripts to deploy **RTAB-Map** (Real-Time Appearance-B
 * **`fake_depth_publisher.py` & `fake_depth_publisher_fixed.py`**: Simulates RGB-D depth image frames for testing pipelines headlessly without physical hardware.
 * **`fake_imu_publisher.py`**: Publishes mock IMU data simulating acceleration and angular velocity.
 * **`imu_throttle.py`**: Rate-limits IMU sensor outputs to prevent high-frequency topics from saturating the ROS 2 message buffers.
-* **`position_tracker.py` & `position_moniter.py`**: Logs the robot's real-time trajectory, speeds, and orientation coordinates into JSON and CSV files.
+* **`position_tracker.py` & `position_monitor.py`**: Logs the robot's real-time trajectory, speeds, and orientation coordinates into JSON and CSV files.
 
 ---
 
