@@ -3,6 +3,7 @@
 Trajectory Plotter
 Reads CSV file and plots the robot's trajectory
 """
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -132,6 +133,9 @@ def plot_trajectory(csv_file):
 def main():
     if len(sys.argv) > 1:
         csv_file = sys.argv[1]
+        if not os.path.exists(csv_file):
+            print(f"❌ Error: Specified file '{csv_file}' does not exist!")
+            return
     else:
         # Find the most recent CSV file
         csv_files = glob.glob('robot_trajectory_*.csv')
@@ -139,8 +143,8 @@ def main():
             print("❌ No trajectory CSV files found!")
             print("Usage: python3 plot_trajectory.py <csv_file>")
             return
-        csv_file = max(csv_files, key=lambda x: x)
-        print(f"📂 Using most recent file: {csv_file}")
+        csv_file = max(csv_files, key=os.path.getmtime)
+        print(f"📂 Using most recent file (by modification time): {csv_file}")
     
     plot_trajectory(csv_file)
 
