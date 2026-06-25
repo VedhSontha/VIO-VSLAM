@@ -136,5 +136,9 @@ python3 "py scripts/position_tracker.py"
 
 To plot the recorded path and generate analytics graphs:
 ```bash
+# Plot a specific trajectory log file
 python3 "py scripts/plot_trajectory.py" path/to/robot_trajectory_file.csv
+
+# Auto-discover and plot the most recent trajectory log file (by modification time)
+python3 "py scripts/plot_trajectory.py"
 ```
