@@ -8,6 +8,13 @@ class FakeIMUPublisher(Node):
     def __init__(self):
         super().__init__('fake_imu_publisher')
         
+        # Declare parameters
+        self.declare_parameter('imu_topic', '/imu_throttled')
+        self.declare_parameter('publish_rate', 20.0)  # Hz
+        
+        imu_topic = self.get_parameter('imu_topic').value
+        publish_rate = self.get_parameter('publish_rate').value
+        
         # Configure QoS
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -18,13 +25,14 @@ class FakeIMUPublisher(Node):
         # Publisher for fake IMU data
         self.publisher = self.create_publisher(
             Imu,
-            '/imu_throttled',
+            imu_topic,
             qos_profile)
         
-        # CRITICAL: 20 Hz to match camera rate (NOT 100 Hz)
-        self.timer = self.create_timer(0.05, self.publish_imu)  # 20 Hz
+        # Create timer based on rate
+        timer_period = 1.0 / publish_rate
+        self.timer = self.create_timer(timer_period, self.publish_imu)
         
-        self.get_logger().info('✅ Fake IMU Publisher started on /imu_throttled at 20 Hz')
+        self.get_logger().info(f'✅ Fake IMU Publisher started on {imu_topic} at {publish_rate} Hz')
     
     def publish_imu(self):
         """Publish a fake IMU message with proper orientation."""
