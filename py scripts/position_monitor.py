@@ -21,15 +21,19 @@ class PositionMonitor(Node):
             depth=10
         )
         
+        # Declare parameter for odometry topic
+        self.declare_parameter('odom_topic', '/rtabmap/odom')
+        odom_topic = self.get_parameter('odom_topic').value
+        
         # Subscribe to RTABMap odometry
         self.subscription = self.create_subscription(
             Odometry,
-            '/rtabmap/odom',
+            odom_topic,
             self.odom_callback,
             qos_profile
         )
         
-        self.get_logger().info('✅ Position Monitor started - watching /rtabmap/odom')
+        self.get_logger().info(f'✅ Position Monitor started - watching {odom_topic}')
         self.count = 0
     
     def quaternion_to_yaw(self, x, y, z, w):
