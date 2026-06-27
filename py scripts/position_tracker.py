@@ -221,15 +221,21 @@ class PositionTracker(Node):
     
     def save_json(self):
         """Save trajectory to JSON file on shutdown"""
+        if not self.position_history:
+            self.get_logger().info('💾 No trajectory points to save.')
+            return
         json_filename = f'robot_trajectory_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
-        with open(json_filename, 'w') as jsonfile:
-            json.dump(self.position_history, jsonfile, indent=2, default=str)
-        self.get_logger().info(f'💾 Saved trajectory to {json_filename}')
+        try:
+            with open(json_filename, 'w') as jsonfile:
+                json.dump(self.position_history, jsonfile, indent=2, default=str)
+            self.get_logger().info(f'💾 Saved trajectory to {json_filename}')
+        except Exception as e:
+            self.get_logger().error(f'❌ Failed to save trajectory to JSON: {e}')
     
     def print_statistics(self):
         """Print trajectory statistics"""
         if len(self.position_history) < 2:
-            self.get_logger().warn('Not enough data points to calculate statistics')
+            self.get_logger().warn('⚠️ Not enough data points to calculate statistics')
             return
         
         # Calculate total distance traveled
@@ -254,6 +260,12 @@ class PositionTracker(Node):
         self.get_logger().info(f'   Final yaw: {math.degrees(final["yaw"]):.1f}°')
         self.get_logger().info('=' * 60)
 
+    def destroy_node(self):
+        """Callback on node destruction to ensure stats are printed and trajectory saved"""
+        self.print_statistics()
+        self.save_json()
+        super().destroy_node()
+
 def main(args=None):
     rclpy.init(args=args)
     node = PositionTracker()
@@ -262,8 +274,6 @@ def main(args=None):
         rclpy.spin(node)
     except KeyboardInterrupt:
         node.get_logger().info('🛑 Shutting down Position Tracker...')
-        node.print_statistics()
-        node.save_json()
     finally:
         node.destroy_node()
         if rclpy.ok():
