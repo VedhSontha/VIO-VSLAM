@@ -19,17 +19,24 @@ class FakeDepthPublisher(Node):
             depth=1
         )
         
+        # Declare parameters for topic names
+        self.declare_parameter('rgb_topic', '/camera/image_raw')
+        self.declare_parameter('depth_topic', '/rtabmap/depth/image')
+
+        rgb_topic = self.get_parameter('rgb_topic').get_parameter_value().string_value
+        depth_topic = self.get_parameter('depth_topic').get_parameter_value().string_value
+        
         # Subscribe to the RGB camera topic
         self.subscription = self.create_subscription(
             Image,
-            '/camera/image_raw',
+            rgb_topic,
             self.image_callback,
             qos_profile)
         
         # Publisher for fake depth image
         self.publisher = self.create_publisher(
             Image,
-            '/rtabmap/depth/image',
+            depth_topic,
             qos_profile)
         
         self.get_logger().info('✅ FakeDepthPublisher started - waiting for /camera/image_raw')
