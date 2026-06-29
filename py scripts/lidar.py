@@ -28,7 +28,7 @@ def generate_launch_description():
             name='visual_odometry',
             output='screen',
             parameters=[{
-                'use_sim_time': True,
+                'use_sim_time': LaunchConfiguration('use_sim_time'),
                 'frame_id': 'camera_rgb_optical_frame',
                 'odom_frame_id': 'odom',
                 'publish_tf': True,
@@ -82,7 +82,7 @@ def generate_launch_description():
             name='rtabmap',
             output='screen',
             parameters=[{
-                'use_sim_time': True,
+                'use_sim_time': LaunchConfiguration('use_sim_time'),
                 
                 # Subscription
                 'subscribe_depth': False,
@@ -166,7 +166,7 @@ def generate_launch_description():
             name='rtabmap_viz',
             output='screen',
             parameters=[{
-                'use_sim_time': True,
+                'use_sim_time': LaunchConfiguration('use_sim_time'),
                 'frame_id': 'camera_rgb_optical_frame',
                 'odom_frame_id': 'odom',
                 'subscribe_odom_info': True,
