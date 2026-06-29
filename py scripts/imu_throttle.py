@@ -50,6 +50,12 @@ class ImuThrottle(Node):
         
         time_diff = (current_time - self.last_pub_time).nanoseconds / 1e9
         
+        if time_diff < 0:
+            # Clock jumped backward (e.g., simulation reset)
+            self.pub.publish(msg)
+            self.last_pub_time = current_time
+            return
+
         if time_diff >= self.min_interval:
             self.pub.publish(msg)
             self.last_pub_time = current_time
