@@ -126,8 +126,10 @@ def plot_trajectory(csv_file):
              family='monospace', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
     
     plt.tight_layout()
-    plt.savefig(csv_file.replace('.csv', '_plot.png'), dpi=150)
-    print(f"✅ Plot saved as: {csv_file.replace('.csv', '_plot.png')}")
+    base_path, _ = os.path.splitext(csv_file)
+    plot_file = base_path + '_plot.png'
+    plt.savefig(plot_file, dpi=150)
+    print(f"✅ Plot saved as: {plot_file}")
     plt.show()
 
 def main():
