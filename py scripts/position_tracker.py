@@ -18,11 +18,14 @@ class PositionTracker(Node):
     def __init__(self):
         super().__init__('position_tracker')
         
-        # Declare parameter for odometry topic
+        # Declare parameters
         self.declare_parameter('odom_topic', '/odom')
-        odom_topic = self.get_parameter('odom_topic').value
+        self.declare_parameter('qos_reliability', 'best_effort')
         
-        # QoS profile - try both RELIABLE and BEST_EFFORT
+        odom_topic = self.get_parameter('odom_topic').value
+        qos_reliability_str = self.get_parameter('qos_reliability').value.lower()
+        
+        # QoS profiles
         qos_reliable = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
             history=HistoryPolicy.KEEP_LAST,
@@ -35,23 +38,20 @@ class PositionTracker(Node):
             depth=10
         )
         
-        # Try subscribing with BEST_EFFORT first (Gazebo default)
-        try:
-            self.odom_subscription = self.create_subscription(
-                Odometry,
-                odom_topic,
-                self.odom_callback,
-                qos_best_effort
-            )
-            self.get_logger().info(f'✅ Subscribed to {odom_topic} with BEST_EFFORT QoS')
-        except:
-            self.odom_subscription = self.create_subscription(
-                Odometry,
-                odom_topic,
-                self.odom_callback,
-                qos_reliable
-            )
-            self.get_logger().info(f'✅ Subscribed to {odom_topic} with RELIABLE QoS')
+        if qos_reliability_str == 'reliable':
+            qos = qos_reliable
+            qos_name = 'RELIABLE'
+        else:
+            qos = qos_best_effort
+            qos_name = 'BEST_EFFORT'
+            
+        self.odom_subscription = self.create_subscription(
+            Odometry,
+            odom_topic,
+            self.odom_callback,
+            qos
+        )
+        self.get_logger().info(f'✅ Subscribed to {odom_topic} with {qos_name} QoS')
         
         # Publisher for current pose (for RViz)
         self.pose_publisher = self.create_publisher(
