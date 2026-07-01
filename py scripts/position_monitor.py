@@ -21,9 +21,12 @@ class PositionMonitor(Node):
             depth=10
         )
         
-        # Declare parameter for odometry topic
+        # Declare parameters
         self.declare_parameter('odom_topic', '/rtabmap/odom')
+        self.declare_parameter('display_skip', 5)
+        
         odom_topic = self.get_parameter('odom_topic').value
+        self.display_skip = self.get_parameter('display_skip').value
         
         # Subscribe to RTABMap odometry
         self.subscription = self.create_subscription(
@@ -33,7 +36,7 @@ class PositionMonitor(Node):
             qos_profile
         )
         
-        self.get_logger().info(f'✅ Position Monitor started - watching {odom_topic}')
+        self.get_logger().info(f'✅ Position Monitor started - watching {odom_topic} (skipping {self.display_skip} msgs)')
         self.count = 0
     
     def quaternion_to_yaw(self, x, y, z, w):
@@ -63,8 +66,8 @@ class PositionMonitor(Node):
         vy = msg.twist.twist.linear.y
         speed = math.sqrt(vx*vx + vy*vy)
         
-        # Display every 5 messages (reduce spam)
-        if self.count % 5 == 0:
+        # Display every N messages (reduce spam)
+        if self.count % self.display_skip == 0:
             # Clear line and print (overwrites previous line)
             sys.stdout.write('\r')
             sys.stdout.write(
