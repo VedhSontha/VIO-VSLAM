@@ -11,9 +11,11 @@ class FakeIMUPublisher(Node):
         # Declare parameters
         self.declare_parameter('imu_topic', '/imu_throttled')
         self.declare_parameter('publish_rate', 20.0)  # Hz
+        self.declare_parameter('frame_id', 'camera_rgb_optical_frame')
         
         imu_topic = self.get_parameter('imu_topic').value
         publish_rate = self.get_parameter('publish_rate').value
+        self.frame_id = self.get_parameter('frame_id').get_parameter_value().string_value
         
         # Configure QoS
         qos_profile = QoSProfile(
@@ -32,7 +34,7 @@ class FakeIMUPublisher(Node):
         timer_period = 1.0 / publish_rate
         self.timer = self.create_timer(timer_period, self.publish_imu)
         
-        self.get_logger().info(f'✅ Fake IMU Publisher started on {imu_topic} at {publish_rate} Hz')
+        self.get_logger().info(f'✅ Fake IMU Publisher started on {imu_topic} at {publish_rate} Hz (frame: {self.frame_id})')
     
     def publish_imu(self):
         """Publish a fake IMU message with proper orientation."""
@@ -40,7 +42,7 @@ class FakeIMUPublisher(Node):
         
         # Set timestamp
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'camera_rgb_optical_frame'  # CRITICAL: Same as camera frame
+        msg.header.frame_id = self.frame_id  # CRITICAL: Same as camera frame
         
         # Identity orientation (no rotation)
         msg.orientation.w = 1.0
